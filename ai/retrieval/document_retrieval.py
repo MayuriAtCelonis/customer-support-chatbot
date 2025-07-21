@@ -5,7 +5,7 @@ from qdrant_client.http import models  # <-- ADD THIS IMPORT
 from qdrant_client.http.models import VectorParams
 import numpy as np
 
-def top_p_filtering_with_temperature(results, p=0.9, temperature=0.01, score_key="score"):
+def top_p_filtering_with_temperature(results, p=0.9, temperature=0.1, score_key="score"):
     """
     Apply temperature to scores, then do top-p (nucleus) filtering.
     """

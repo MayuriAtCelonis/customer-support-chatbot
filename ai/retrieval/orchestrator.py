@@ -22,7 +22,7 @@ def retrieve_releveant_context(
         collection_name = QDRANT_COLLECTION
     if client is None or model is None:
         client, model = init_vector_db_connections(collection_name)
-    results = search_similar(client, model, query, collection_name, top_k=top_k)
+    results = search_similar(client, model, query, collection_name, top_k=25)
     return [
         {
             "score": r["score"],

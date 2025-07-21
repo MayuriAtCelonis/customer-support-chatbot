@@ -1,3 +1,4 @@
+import traceback
 from ai.retrieval.orchestrator import retrieve_releveant_context
 from ai.generation.orchestrator import generate_response, summarise_query_from_chat_history
 
@@ -49,5 +50,6 @@ def process_chat_history(chat_history, enable_reasoning=False):
             "reasoning": f"An error occurred while generating the response: {str(e)}",
             "scores": None
         }
+        traceback.print_exc()
 
     return response
