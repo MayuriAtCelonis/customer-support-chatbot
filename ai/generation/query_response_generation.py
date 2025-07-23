@@ -31,9 +31,10 @@ def get_prompt_for_generation(chat_history, relevant_documents=None, summarised_
         prompt_parts.append("")  # Add a blank line
     base_prompt = (
         """Based on the above, provide a helpful, accurate, and concise answer to the user's query.\n"
-        "You must ONLY use information from the relevant QnA and the past conversation above.\n"
-        "If the answer is not present in the provided `QnA exmples or chat history, respond with: 'I'm sorry, I do not have enough information to answer that question.'\n"
-        "Do NOT use any external knowledge or make up information.\n"
+        "Instructuons to follow strictly:\n"
+        "1. You must ONLY use information from the relevant QnA and the past conversation above.\n"
+        "2. If the answer is not present in the provided `QnA exmples or chat history, respond with: 'I'm sorry, I do not have enough information to answer that question.'\n"
+        "3. Do NOT use any external knowledge or make up information.\n"
         """
     )
     prompt_parts.append(base_prompt)

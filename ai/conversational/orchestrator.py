@@ -31,7 +31,7 @@ def process_chat_history(chat_history, enable_reasoning=False):
 
     # Retrieve relevant context (failsafe: returns [] if not possible)
     try:
-        relevant_context = retrieve_releveant_context(summarised_query)
+        relevant_context , mean_distance , median_distance= retrieve_releveant_context(summarised_query, top_k=20)
     except Exception:
         relevant_context = []
     relevant_documents = [item["document"] for item in relevant_context] if relevant_context else None
@@ -44,11 +44,17 @@ def process_chat_history(chat_history, enable_reasoning=False):
             summarised_query=summarised_query,
             enable_reasoning=enable_reasoning
         )
+        response["evaluations"] = {
+                "retrieved_examples_mean_distance": mean_distance,
+                "retrieved_examples_median_distance": median_distance
+            }
+        response["success"] = True
     except Exception as e:
         response = {
             "answer": "An error occurred while generating the response!",
             "reasoning": f"An error occurred while generating the response: {str(e)}",
-            "scores": None
+            "scores": None,
+            "success": False
         }
         traceback.print_exc()
 

@@ -3,3 +3,4 @@ sentence-transformers>=2.2.2
 pytest>=7.0.0
 huggingface_hub
 datasets
+pandas

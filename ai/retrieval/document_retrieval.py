@@ -1,4 +1,5 @@
 import logging
+import pandas as pd
 # from datasets import load_dataset
 from sentence_transformers import SentenceTransformer
 from qdrant_client.http import models  # <-- ADD THIS IMPORT
@@ -43,6 +44,8 @@ def search_similar(client, model, query, collection_name, top_k=5):
         query_vector=query_vec,
         limit=top_k
     )
+    if not hits or len(hits) == 0:
+        return [], None, None
     results = []
     for hit in hits:
         results.append({
@@ -53,5 +56,37 @@ def search_similar(client, model, query, collection_name, top_k=5):
         })
 
     top_p_results = top_p_filtering_with_temperature(results=results)
-    print(f"{len(results)=} | {len(top_p_results)=} ")
-    return top_p_results
+    mean_distance , median_distance = find_inter_document_similarity(results , model)
+    return top_p_results , mean_distance , median_distance
+
+
+def find_inter_document_similarity(results, model=None):
+    """
+    Find inter-document similarity within a collection.
+    Returns mean and median of pairwise distances between documents.
+    """
+    df_documents = pd.DataFrame(results)
+    df_documents['input'] = df_documents['input'].astype(str)
+    df_documents['reply'] = df_documents['reply'].astype(str)
+    df_documents['text'] = 'Question : ' + df_documents['input'] + " Answer : " + df_documents['reply']
+    doc_vectors = model.encode(df_documents['text'].to_list(),
+                          batch_size=32,  # Adjust batch_size based on your GPU memory
+                          show_progress_bar=True,
+                          convert_to_tensor=True, # Returns torch.Tensor, can be faster for some downstream tasks
+                    )
+
+    # if not doc_vectors == None:
+    #     return {"mean_distance": None, "median_distance": None}
+
+    # Compute pairwise cosine similarity
+    similarities = np.dot(doc_vectors.cpu().numpy(), np.transpose(doc_vectors.cpu().numpy()))
+    distances = 1 - similarities  # Convert similarity to distance
+    np.fill_diagonal(distances, np.nan)  # Ignore self-similarity
+
+    # Flatten the distance matrix and remove NaN values
+    distance_values = distances[np.isfinite(distances)].flatten()
+
+    mean_distance = np.mean(distance_values) if distance_values.size > 0 else None
+    median_distance = np.median(distance_values) if distance_values.size > 0 else None
+
+    return mean_distance , median_distance
