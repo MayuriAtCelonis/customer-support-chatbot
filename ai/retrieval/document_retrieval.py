@@ -36,7 +36,7 @@ def top_p_filtering_with_temperature(results, p=0.9, temperature=0.1, score_key=
 def search_similar(client, model, query, collection_name, top_k=5):
     """
     Given a query string, embed and search in Qdrant.
-    Returns list of matched documents with scores.
+    Returns list of matched documents with scores, and mean/median distances for all and top_p results.
     """
     query_vec = model.encode([query])[0].tolist()
     hits = client.search(
@@ -45,7 +45,7 @@ def search_similar(client, model, query, collection_name, top_k=5):
         limit=top_k
     )
     if not hits or len(hits) == 0:
-        return [], None, None
+        return [], None, None, None, None
     results = []
     for hit in hits:
         results.append({
@@ -56,14 +56,21 @@ def search_similar(client, model, query, collection_name, top_k=5):
         })
 
     top_p_results = top_p_filtering_with_temperature(results=results)
-    mean_distance , median_distance = find_inter_document_similarity(results , model)
-    return top_p_results , mean_distance , median_distance
+    mean_inter_document_similarity, median_inter_document_similarity = find_inter_document_similarity(results, model)
+    # Calculate mean/median of query-to-document similarity (score) for top_p_results
+    if top_p_results:
+        scores = [r["score"] for r in top_p_results]
+        mean_document_query_similarity = float(np.mean(scores)) if scores else None
+        median_document_query_similarity = float(np.median(scores)) if scores else None
+    else:
+        mean_document_query_similarity, median_document_query_similarity = None, None
+    return top_p_results, mean_inter_document_similarity, median_inter_document_similarity, mean_document_query_similarity, median_document_query_similarity
 
 
 def find_inter_document_similarity(results, model=None):
     """
     Find inter-document similarity within a collection.
-    Returns mean and median of pairwise distances between documents.
+    Returns mean and median of pairwise cosine similarities between documents.
     """
     df_documents = pd.DataFrame(results)
     df_documents['input'] = df_documents['input'].astype(str)
@@ -75,18 +82,14 @@ def find_inter_document_similarity(results, model=None):
                           convert_to_tensor=True, # Returns torch.Tensor, can be faster for some downstream tasks
                     )
 
-    # if not doc_vectors == None:
-    #     return {"mean_distance": None, "median_distance": None}
-
     # Compute pairwise cosine similarity
     similarities = np.dot(doc_vectors.cpu().numpy(), np.transpose(doc_vectors.cpu().numpy()))
-    distances = 1 - similarities  # Convert similarity to distance
-    np.fill_diagonal(distances, np.nan)  # Ignore self-similarity
+    np.fill_diagonal(similarities, np.nan)  # Ignore self-similarity
 
-    # Flatten the distance matrix and remove NaN values
-    distance_values = distances[np.isfinite(distances)].flatten()
+    # Flatten the similarity matrix and remove NaN values
+    similarity_values = similarities[np.isfinite(similarities)].flatten()
 
-    mean_distance = np.mean(distance_values) if distance_values.size > 0 else None
-    median_distance = np.median(distance_values) if distance_values.size > 0 else None
+    mean_similarity = np.mean(similarity_values) if similarity_values.size > 0 else None
+    median_similarity = np.median(similarity_values) if similarity_values.size > 0 else None
 
-    return mean_distance , median_distance
+    return mean_similarity, median_similarity

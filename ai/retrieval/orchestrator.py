@@ -22,7 +22,7 @@ def retrieve_releveant_context(
         collection_name = QDRANT_COLLECTION
     if client is None or model is None:
         client, model = init_vector_db_connections(collection_name)
-    results ,  mean_distance , median_distance= search_similar(client, model, query, collection_name, top_k=top_k)
+    results, mean_inter_document_similarity, median_inter_document_similarity, mean_document_query_similarity, median_document_query_similarity = search_similar(client, model, query, collection_name, top_k=top_k)
     return [
         {
             "score": r["score"],
@@ -32,4 +32,4 @@ def retrieve_releveant_context(
             }
         }
         for r in results
-    ] ,  mean_distance , median_distance
+    ], mean_inter_document_similarity, median_inter_document_similarity, mean_document_query_similarity, median_document_query_similarity

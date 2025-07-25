@@ -43,7 +43,7 @@ def generate_response(chat_history, relevant_documents=None, summarised_query=No
     llm_response = generate_response_from_llm(
         provider="openai",
         prompt=prompt,
-        api_key=os.environ['openai_api_key'],
+        api_key=os.environ['OPENAI_API_KEY'],
         model="gpt-4.1",
         # function_call=get_user_query_and_reasoning_tool_definition(),
         tools=get_user_query_and_reasoning_tool_definition()

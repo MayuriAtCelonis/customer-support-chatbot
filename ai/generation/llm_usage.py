@@ -37,7 +37,7 @@ def get_llm_client(provider: str, api_key: Optional[str] = None, **kwargs) -> An
 def generate_response_from_llm(
     provider: str,
     prompt: Optional[str] = None,
-    api_key: Optional[str] = os.getenv('openai_api_key', ''),
+    api_key: Optional[str] = os.getenv('OPENAI_API_KEY', ''),
     # api_key: Optional[str] = '',
     model: Optional[str] = None,
     messages: Optional[List[Dict]] = None,

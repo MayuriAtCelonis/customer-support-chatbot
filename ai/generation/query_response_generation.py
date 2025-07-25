@@ -30,11 +30,13 @@ def get_prompt_for_generation(chat_history, relevant_documents=None, summarised_
             prompt_parts.append(f"{role.capitalize()}: {content}")
         prompt_parts.append("")  # Add a blank line
     base_prompt = (
-        """Based on the above, provide a helpful, accurate, and concise answer to the user's query.\n"
+        """Based on the above, provide a helpful, accurate, and concise answer to address the user's query in order to resolve the issue.\n"
         "Instructuons to follow strictly:\n"
         "1. You must ONLY use information from the relevant QnA and the past conversation above.\n"
         "2. If the answer is not present in the provided `QnA exmples or chat history, respond with: 'I'm sorry, I do not have enough information to answer that question.'\n"
         "3. Do NOT use any external knowledge or make up information.\n"
+        "4. If your response contains multiple steps, please use numbers to enumerate the steps and order them with the highest priority step first and in chronological order of execution.\n"
+        "5. Avoid use of obsene language or words, ensure a tone of empathy and care.\n"
         """
     )
     prompt_parts.append(base_prompt)
@@ -50,17 +52,17 @@ def get_user_query_and_reasoning_tool_definition():
         "type": "function",
         "function": {
             "name": "generate_response_and_reasoning",
-            "description": "Generates a response to the user's query and provides a step-by-step reasoning for the answer.",
+            "description": "Generates a response to the user's query and provides a step-by-step reasoning for the response.",
             "parameters": {
                 "type": "object",
                 "properties": {
                     "response": {
                         "type": "string",
-                        "description": "The answer or response to the user's query."
+                        "description": "The answer or response to resolve the user's query."
                     },
                     "reasoning": {
                         "type": "string",
-                        "description": "A step-by-step explanation or reasoning for the answer provided. Do not disclose that past QnA were referred ."
+                        "description": "A step-by-step explanation or reasoning for the response provided. Do not disclose that past QnA were referred."
                     }
                 },
                 "required": ["response", "reasoning"]

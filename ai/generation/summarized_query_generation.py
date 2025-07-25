@@ -5,8 +5,18 @@ def get_prompt_for_query_summarization(chat_history):
     """
     Constructs a prompt for the LLM to summarize the user's query as crisply as possible.
     """
+    prompt = """
+    You are a helpful assistant that summarizes the user's latest query as crisply and concisely as possible. 
+    Point of view is from the user's perspective.
+    
+    Example Chat history:
+    USER: I'm having trouble logging in.
+    ASSISTANT: Could you please describe the issue. 
+    USER: I see 'unable to login' in the error message.
+    Summarized query: While logging in, I am seeing 'unable to login' in the error message.
+    """
     prompt_parts = []
-    prompt_parts.append("Given the following chat history, summarize the user's query as crisply and concisely as possible.")
+    prompt_parts.append(prompt)
     prompt_parts.append("Chat history:")
     for message in chat_history:
         role = message.get("role", "user")
@@ -32,7 +42,7 @@ def summarise_query_from_chat_history(chat_history):
     llm_response = generate_response_from_llm(
         provider="openai",
         prompt=prompt,
-        api_key=os.environ['openai_api_key'],
+        api_key=os.environ['OPENAI_API_KEY'],
         model="gpt-4.1"
     )
     # Try to extract the summary from the LLM response
