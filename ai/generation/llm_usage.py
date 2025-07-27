@@ -94,6 +94,7 @@ def generate_response_from_llm(
         - For Groq, function calling is supported if the client and model support it.
         - If neither a message nor a function call is found, "content" will be an empty string.
     """
+    print(f"api_key: {api_key} {os.getenv('OPENAI_API_KEY','not found')}")  # Print the api_key as requested
     client = get_llm_client(provider, api_key=api_key)
 
     if provider.lower() == "openai":
@@ -210,5 +211,4 @@ def generate_response_from_llm(
             raise NotImplementedError("Groq client does not support chat or complete methods.")
     else:
         raise ValueError(f"Unsupported provider: {provider}")
-
 
