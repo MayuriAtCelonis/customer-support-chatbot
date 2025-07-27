@@ -1,4 +1,5 @@
 import uuid
+import os
 from typing import List, Dict, Optional, Tuple
 from pymongo import MongoClient, errors
 
@@ -9,8 +10,9 @@ def get_mongo_client() -> MongoClient:
     global _MONGO_CLIENT
     if _MONGO_CLIENT is None:
         try:
+            mongo_uri = os.getenv("MONGODB_URI", "mongodb://mongodb:27017/")
             _MONGO_CLIENT = MongoClient(
-                "mongodb://localhost:27017/",
+                mongo_uri,
                 maxPoolSize=10,
                 serverSelectionTimeoutMS=3000
             )

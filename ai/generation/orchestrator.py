@@ -4,7 +4,7 @@ import os
 
 def generate_response(chat_history, relevant_documents=None, summarised_query=None, enable_reasoning=True):
     """
-    Accepts chat history, relevant documents, a summarised query, and an enable_reasoning flag. Returns a dictionary with answer, reasoning (optional), and scores.
+    Accepts chat history, relevant documents, a summarised query, and an enable_reasoning flag. Returns a dictionary with answer, reasoning (optional).
 
     Args:
         chat_history (list of dict): List of chat messages, each dict should have at least 'role' and 'content' keys.
@@ -16,14 +16,12 @@ def generate_response(chat_history, relevant_documents=None, summarised_query=No
         dict: {
             "answer": <str>,
             "reasoning": <str, optional>,
-            "scores": <dict>
         }
     """
     if not chat_history or not isinstance(chat_history, list):
         response = {
             "answer": "",
             "reasoning": "No chat history provided.",
-            "scores": None,
             "relevant_documents": relevant_documents,
             "summarised_query": summarised_query
         }
@@ -58,7 +56,6 @@ def generate_response(chat_history, relevant_documents=None, summarised_query=No
 
     response = {
         "answer": answer,
-        "scores": None,
         "relevant_documents": relevant_documents,
         "summarised_query": summarised_query
     }

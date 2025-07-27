@@ -208,4 +208,9 @@ __marimo__/
 
 test.ipynb
 qdrant_storage
-ai/retrieval/load/
+# ai/retrieval/load/
+*.csv
+
+/qdrant_storage
+/qdrant_data
+

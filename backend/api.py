@@ -23,12 +23,12 @@ class ProcessChatHistoryRequest(BaseModel):
 class ProcessChatHistoryResponse(BaseModel):
     answer: str
     reasoning: Optional[str] = None
-    scores: Optional[Any] = None
     success: Optional[bool] = None
     evaluations: Optional[Any] = None
     conversation_id: Optional[str] = None
+    relevant_documents: Optional[List[dict]] = None
 
-@app.post("/process_chat", response_model=ProcessChatHistoryResponse)
+@app.post("/generate_response", response_model=ProcessChatHistoryResponse)
 async def process_chat(request: ProcessChatHistoryRequest):
     """
     Process a user query and manage conversation state.
@@ -68,10 +68,10 @@ async def process_chat(request: ProcessChatHistoryRequest):
         return ProcessChatHistoryResponse(
             answer=result.get("answer"),
             reasoning=result.get("reasoning"),
-            scores=result.get("scores"),
             success=True,
             evaluations=result.get("evaluations"),
-            conversation_id=result.get("conversation_id")
+            conversation_id=result.get("conversation_id"),
+            relevant_documents=result.get("relevant_documents")
         )
     except HTTPException:
         raise

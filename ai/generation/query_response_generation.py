@@ -37,6 +37,7 @@ def get_prompt_for_generation(chat_history, relevant_documents=None, summarised_
         "3. Do NOT use any external knowledge or make up information.\n"
         "4. If your response contains multiple steps, please use numbers to enumerate the steps and order them with the highest priority step first and in chronological order of execution.\n"
         "5. Avoid use of obsene language or words, ensure a tone of empathy and care.\n"
+        "6. Handle the greeting and farewell messages with care and empathy.\n"
         """
     )
     prompt_parts.append(base_prompt)

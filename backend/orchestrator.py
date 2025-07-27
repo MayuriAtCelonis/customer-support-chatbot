@@ -3,8 +3,7 @@ from typing import Tuple, Optional, Dict, Any
 from backend.conversation_management import (
     get_conversation_history,
     set_new_conversation_history,
-    append_conversation_history,
-    validate_chat_history,
+    append_conversation_history
 )
 from ai.conversational.orchestrator import process_chat_history as process_chat_history_core
 
@@ -78,12 +77,6 @@ def process_chat_history_api(
                 operation_error_message = error_message or "Failed to retrieve conversation history."
                 logger.error(f"Failed to retrieve conversation history: {operation_error_message}")
                 return operation_result, result, operation_error_message
-            
-            # Validate existing chat history
-            if not validate_chat_history(chat_history):
-                operation_error_message = "Invalid chat history format retrieved from database"
-                logger.error(f"Invalid chat history format for conversation {conversation_id}")
-                return operation_result, result, operation_error_message
 
             new_chat = [{"role": "user", "content": user_query}]
             logger.info(f"Appending new user query to conversation_id {conversation_id}: {user_query[:50]}...")
@@ -132,12 +125,7 @@ def process_chat_history_api(
             "reasoning": result.get("reasoning", "")
         }]
         
-        # Validate the assistant response before storing
-        if not validate_chat_history(new_content):
-            operation_error_message = "Invalid assistant response format"
-            logger.error(f"Invalid assistant response format for conversation {conversation_id}")
-            return operation_result, result, operation_error_message
-        
+     
         logger.info(f"Appending assistant response to conversation_id {conversation_id}")
         append_success, op_result, append_error = append_conversation_history(
             conversation_id, new_content
@@ -146,9 +134,7 @@ def process_chat_history_api(
         if not append_success:
             operation_error_message = append_error or "Failed to append assistant response to conversation history."
             logger.error(f"Failed to append assistant response: {operation_error_message}")
-            # Don't return here - the main processing was successful, just logging failed
-            # The user still gets their response
-        
+
         logger.info(f"Successfully processed conversation {conversation_id}")
         
     except Exception as e:

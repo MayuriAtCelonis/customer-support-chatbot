@@ -43,7 +43,7 @@ def summarise_query_from_chat_history(chat_history):
         provider="openai",
         prompt=prompt,
         api_key=os.getenv('OPENAI_API_KEY'),
-        model="gpt-4.1"
+        model="gpt-4.1" #TODO: model and its provider details ideally must come from the env
     )
     # Try to extract the summary from the LLM response
     if isinstance(llm_response, dict):
